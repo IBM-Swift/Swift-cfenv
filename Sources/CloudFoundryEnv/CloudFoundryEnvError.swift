@@ -14,6 +14,8 @@
  * limitations under the License.
  **/
 
+import Foundation
+
 public enum CloudFoundryEnvError: Error {
-  case InvalidValue(String)
+    case InvalidValue(String)
 }

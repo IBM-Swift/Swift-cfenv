@@ -28,7 +28,7 @@ public struct JSONUtils {
   public static func convertStringToJSON(text: String?) -> [String:Any]? {
     let data = text?.data(using: String.Encoding.utf8)
     guard let nsData = data else {
-      Log.error("Could not generate JSON object from string: \(text)")
+      Log.error("Could not generate JSON object from string: \(String(describing: text))")
       return nil
     }
     if let json = try? JSONSerialization.jsonObject(with: nsData) {
