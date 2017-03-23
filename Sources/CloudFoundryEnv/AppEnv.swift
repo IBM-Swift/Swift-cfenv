@@ -1,5 +1,5 @@
 /**
-* Copyright IBM Corporation 2016
+* Copyright IBM Corporation 2016,2017
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -15,47 +15,64 @@
 **/
 
 import Foundation
+import Configuration
 import LoggerAPI
 
-public struct AppEnv {
-  public let isLocal: Bool
-  public let port: Int
-  public let name: String?
-  public let bind: String
-  public let urls: [String]
-  public let url: String
-  public let app: [String : Any]
-  public let services: [String : Any]
+extension ConfigurationManager {
+  public var isLocal: Bool {
+    let vcapApplication = self["VCAP_APPLICATION"]
+    return (vcapApplication == nil)
+  }
 
-  /**
-  * The vcap option property is ignored if not running locally.
-  */
-  public init(options: [String : Any]) throws {
-    // NSProcessInfo.processInfo().environment returns [String : String]
-    let environmentVars = ProcessInfo.processInfo.environment
-    let vcapApplication = environmentVars["VCAP_APPLICATION"]
-    isLocal = (vcapApplication == nil)
+  public var app: [String : Any] {
+    let app = self["VCAP_APPLICATION"] as? [String : Any] ?? self["vcap:application"] as? [String : Any] ?? [:]
+    return app
+  }
 
-    // Get app
-    app = try AppEnv.parseEnvVariable(isLocal: isLocal, environmentVars: environmentVars,
-      variableName: "VCAP_APPLICATION", variableType: "application", options: options)
+  public var port: Int {
+    let port: Int = self["PORT"] as? Int ?? self["CF_INSTANCE_PORT"] as? Int ?? self["VCAP_APP_PORT"] as? Int ?? 8080
+    return port
+  }
 
-    // Get services
-    services = try AppEnv.parseEnvVariable(isLocal: isLocal, environmentVars: environmentVars,
-      variableName: "VCAP_SERVICES", variableType: "services", options: options)
+  public var name: String? {
+    let name: String? =  self["name"] as? String ?? app["name"] as? String
+    // TODO: Add logic for parsing manifest.yml to get name
+    // https://github.com/behrang/YamlSwift
+    // http://stackoverflow.com/questions/24097826/read-and-write-data-from-text-file
+    return name
+  }
 
-    // Get port
-    port = try AppEnv.parsePort(environmentVars: environmentVars, app: app)
+  public var bind: String {
+    let bind = app["host"] as? String ?? "0.0.0.0"
+    return bind
+  }
 
-    // Get name
-    name = AppEnv.parseName(app: app, options: options)
+  public var urls: [String] {
+    var uris: [String] = JSONUtils.convertJSONArrayToStringArray(json: app, fieldName: "uris")
+    if isLocal {
+      uris = ["localhost:\(port)"]
+    } else {
+      if uris.count == 0 {
+        uris = ["localhost"]
+      }
+    }
 
-    // Get bind (IP address of the application instance)
-    bind = app["host"] as? String ?? "0.0.0.0"
+    let scheme: String = self["protocol"] as? String ?? (isLocal ? "http" : "https")
+    var urls: [String] = []
+    for uri in uris {
+      urls.append("\(scheme)://\(uri)")
+    }
+    return urls
+  }
 
-    // Get urls
-    urls = AppEnv.parseURLs(isLocal: isLocal, app: app, port: port, options: options)
-    url = urls[0]
+  public var url: String {
+    let url = urls[0]
+    return url
+  }
+
+  public var services: [String : Any] {
+    let services = self["VCAP_SERVICES"] as? [String : Any] ?? self["vcap:services"] as? [String : Any] ?? [:]
+    return services
   }
 
   /**
@@ -65,10 +82,10 @@ public struct AppEnv {
     // Get limits
     let limits: App.Limits
     if let limitsMap = app["limits"] as? [String : Int],
-      let memory = limitsMap["mem"],
-      let disk = limitsMap["disk"],
-      let fds = limitsMap["fds"] {
-        limits = App.Limits(memory: memory, disk: disk, fds: fds)
+    let memory = limitsMap["mem"],
+    let disk = limitsMap["disk"],
+    let fds = limitsMap["fds"] {
+      limits = App.Limits(memory: memory, disk: disk, fds: fds)
     } else {
       return nil
     }
@@ -80,17 +97,17 @@ public struct AppEnv {
 
     // App instance should only be created if all required variables exist
     let appObj = App.Builder()
-      .setId(id: app["application_id"] as? String)
-      .setName(name: app["application_name"] as? String)
-      .setUris(uris: uris)
-      .setVersion(version: app["version"] as? String)
-      .setInstanceId(instanceId: app["instance_id"] as? String)
-      .setInstanceIndex(instanceIndex:  app["instance_index"] as? Int)
-      .setLimits(limits: limits)
-      .setPort(port: app["port"] as? Int)
-      .setSpaceId(spaceId: app["space_id"] as? String)
-      .setStartedAt(startedAt: dateUtils.convertStringToNSDate(dateString: app["started_at"] as? String))
-      .build()
+    .setId(id: app["application_id"] as? String)
+    .setName(name: app["application_name"] as? String)
+    .setUris(uris: uris)
+    .setVersion(version: app["version"] as? String)
+    .setInstanceId(instanceId: app["instance_id"] as? String)
+    .setInstanceIndex(instanceIndex:  app["instance_index"] as? Int)
+    .setLimits(limits: limits)
+    .setPort(port: app["port"] as? Int)
+    .setSpaceId(spaceId: app["space_id"] as? String)
+    .setStartedAt(startedAt: dateUtils.convertStringToNSDate(dateString: app["started_at"] as? String))
+    .build()
     return appObj
   }
 
@@ -109,14 +126,14 @@ public struct AppEnv {
           let credentials: [String:Any]? = serv["credentials"] as? [String:Any]
           if let name: String = serv["name"] as? String,
           let service = Service.Builder()
-            .setName(name: serv["name"] as? String)
-            .setLabel(label: serv["label"] as? String)
-            .setTags(tags: tags)
-            .setPlan(plan: serv["plan"] as? String)
-            .setCredentials(credentials: credentials)
-            .build() {
-              results[name] = service
-            }
+          .setName(name: serv["name"] as? String)
+          .setLabel(label: serv["label"] as? String)
+          .setTags(tags: tags)
+          .setPlan(plan: serv["plan"] as? String)
+          .setCredentials(credentials: credentials)
+          .build() {
+            results[name] = service
+          }
         }
       }
     }
@@ -128,20 +145,23 @@ public struct AppEnv {
   * no services that match the type parameter, this method returns an empty array.
   */
   public func getServices(type: String) -> [Service] {
-    let servs = services[type] as? [[String:Any]] ?? [[:]]
-    let results = servs.map { (serv) -> Service? in
-      let tags = JSONUtils.convertJSONArrayToStringArray(json: serv, fieldName: "tags")
-      let credentials: [String:Any]? = serv["credentials"] as? [String:Any]
-      let service = Service.Builder()
-        .setName(name: serv["name"] as? String)
-        .setLabel(label: serv["label"] as? String)
-        .setTags(tags: tags)
-        .setPlan(plan: serv["plan"] as? String)
-        .setCredentials(credentials: credentials)
-        .build()
-      return service
+    if let servs = services[type] as? [[String:Any]] {
+      return parseServices(servs: servs)
+    } else {
+      let filteredServs = Array(services.filterWithRegex(regex: type).values)
+        .map { (array: Any) -> [String:Any] in
+          if let array = array as? [Any] {
+            for innerArray in array {
+              if let dict = innerArray as? [String:Any] {
+                return dict
+              }
+            }
+          }
+          return [:]
+        }
+        .filter{ (dict: [String:Any]) -> Bool in dict.count > 0 }
+      return parseServices(servs: filteredServs)
     }
-    return results.flatMap { $0 }
   }
 
   /**
@@ -158,9 +178,9 @@ public struct AppEnv {
 
     do {
       #if os(Linux)
-        let regex = try RegularExpression(pattern: spec, options: RegularExpression.Options.caseInsensitive)
+      let regex = try RegularExpression(pattern: spec, options: RegularExpression.Options.caseInsensitive)
       #else
-        let regex = try NSRegularExpression(pattern: spec, options: NSRegularExpression.Options.caseInsensitive)
+      let regex = try NSRegularExpression(pattern: spec, options: NSRegularExpression.Options.caseInsensitive)
       #endif
 
       for (name, serv) in services {
@@ -191,7 +211,7 @@ public struct AppEnv {
     }
 
     guard let url: String =
-      credentials[substitutions["url"] as? String ?? "url"] as? String ?? credentials["uri"] as? String
+    credentials[substitutions["url"] as? String ?? "url"] as? String ?? credentials["uri"] as? String
     else {
       return nil
     }
@@ -218,7 +238,7 @@ public struct AppEnv {
       parsedURL.host = host
     }
     if let scheme = substitutions["scheme"] as? String {
-        parsedURL.scheme = scheme
+      parsedURL.scheme = scheme
     }
     if let query = substitutions["query"] as? String {
       parsedURL.query = query
@@ -263,82 +283,21 @@ public struct AppEnv {
     }
   }
 
-  /**
-  * Static method for parsing VCAP_APPLICATION and VCAP_SERVICES.
-  */
-  private static func parseEnvVariable(isLocal: Bool, environmentVars: [String:String],
-    variableName: String, variableType: String, options: [String:Any]) throws
-    -> [String:Any] {
-
-    // If environment variable is found, then let's use it
-    if let _ = environmentVars[variableName] {
-      if let json = JSONUtils.convertStringToJSON(text: environmentVars[variableName]) {
-        return json
-      }
-      throw CloudFoundryEnvError.InvalidValue("Environment variable \(variableName) is not a valid JSON string!")
+  private func parseServices(servs: [[String:Any]]) -> [Service] {
+    let results = servs.map { (serv) -> Service? in
+      let tags = JSONUtils.convertJSONArrayToStringArray(json: serv, fieldName: "tags")
+      let credentials: [String:Any]? = serv["credentials"] as? [String:Any]
+      let service = Service.Builder()
+      .setName(name: serv["name"] as? String)
+      .setLabel(label: serv["label"] as? String)
+      .setTags(tags: tags)
+      .setPlan(plan: serv["plan"] as? String)
+      .setCredentials(credentials: credentials)
+      .build()
+      return service
     }
-    // If environment variable was not found, let's query options
-    if let vcap = options["vcap"] as? [String:Any],
-      let envVariable = vcap[variableType] as? [String:Any] {
-        return envVariable
-    }
-    return [:]
+    print("results: \(results)")
+    return results.flatMap { $0 }
   }
 
-  /**
-  * Static method for parsing the port number.
-  */
-  private static func parsePort(environmentVars: [String:String], app: [String : Any]) throws -> Int {
-    let portString: String = environmentVars["PORT"] ?? environmentVars["CF_INSTANCE_PORT"] ??
-      environmentVars["VCAP_APP_PORT"] ?? "8080"
-
-    // TODO: Are there any benefits in implementing logic similar to ports.getPort() (npm module)...?
-    // if portString == nil {
-    //   if app["name"].string == nil {
-    //     portString = "8080"
-    //   }
-    //   //portString = "" + (ports.getPort(appEnv.name));
-    //   portString = "8080"
-    // }
-    //let number: Int? = (portString != nil) ? Int(portString!) : nil
-
-    if let number = Int(portString) {
-      return number
-    } else {
-      throw CloudFoundryEnvError.InvalidValue("Invalid PORT value: \(portString)")
-    }
-  }
-
-  /**
-  * Static method for parsing the name for the application.
-  */
-  private static func parseName(app: [String:Any], options: [String:Any]) -> String? {
-    let name: String? = options["name"] as? String ?? app["name"] as? String
-    // TODO: Add logic for parsing manifest.yml to get name
-    // https://github.com/behrang/YamlSwift
-    // http://stackoverflow.com/questions/24097826/read-and-write-data-from-text-file
-    return name
-  }
-
-  /**
-  * Static method for parsing the URLs for the application.
-  */
-  private static func parseURLs(isLocal: Bool, app: [String : Any], port: Int,
-    options: [String:Any]) -> [String] {
-    var uris: [String] = JSONUtils.convertJSONArrayToStringArray(json: app, fieldName: "uris")
-    if isLocal {
-      uris = ["localhost:\(port)"]
-    } else {
-      if uris.count == 0 {
-        uris = ["localhost"]
-      }
-    }
-
-    let scheme: String = options["protocol"] as? String ?? (isLocal ? "http" : "https")
-    var urls: [String] = []
-    for uri in uris {
-      urls.append("\(scheme)://\(uri)")
-    }
-    return urls
-  }
 }

@@ -3,7 +3,9 @@
     "application": {
       "application_id": "e582416a-9771-453f-8df1-7b467f6d78e4",
       "application_name": "swift-test",
-      "application_uris": ["swift-test.mybluemix.net"],
+      "application_uris": [
+        "swift-test.mybluemix.net"
+      ],
       "application_version": "e5e029d1-4a1a-4004-9f79-655d550183fb",
       "host": "0.0.0.0",
       "instance_id": "7d4f24cfba06462ba23d68aaf1d7354a",
@@ -21,30 +23,95 @@
       "started_at": "2016-03-04 02:43:07 +0000",
       "started_at_timestamp": 1457059387,
       "state_timestamp": 1457059387,
-      "uris": ["swift-test.mybluemix.net"],
+      "uris": [
+        "swift-test.mybluemix.net"
+      ],
       "users": null,
       "version": "e5e029d1-4a1a-4004-9f79-655d550183fb",
+
     },
     "services": {
       "cloudantNoSQLDB": [
         {
-          "credentials":                 {
+          "credentials": {
             "host": "09ed7c8a-fae8-48ea-affa-0b44b2224ec0-bluemix.cloudant.com",
             "password": "06c19ae06b1915d8a6649df5901eca85e885182421ffa9ef89e14bbc1b76efd4",
             "port": 443,
             "url": "https://09ed7c8a-fae8-48ea-affa-0b44b2224ec0-bluemix:06c19ae06b1915d8a6649df5901eca85e885182421ffa9ef89e14bbc1b76efd4@09ed7c8a-fae8-48ea-affa-0b44b2224ec0-bluemix.cloudant.com",
             "username": "09ed7c8a-fae8-48ea-affa-0b44b2224ec0-bluemix",
+
           },
           "label": "cloudantNoSQLDB",
           "name": "Cloudant NoSQL DB-kd",
           "plan": "Shared",
-          "tags":[
+          "tags": [
             "data_management",
             "ibm_created",
             "ibm_dedicated_public"
           ],
+
         }
       ],
+      "cloudantNoSQLDB-Test": [
+        {
+          "credentials": {
+            "host": "09ed7c8a-fae8-48ea-affa-0b44b2224ec0-bluemix.cloudant.com",
+            "password": "06c19ae06b1915d8a6649df5901eca85e885182421ffa9ef89e14bbc1b76efd4",
+            "port": 443,
+            "url": "https://09ed7c8a-fae8-48ea-affa-0b44b2224ec0-bluemix:06c19ae06b1915d8a6649df5901eca85e885182421ffa9ef89e14bbc1b76efd4@09ed7c8a-fae8-48ea-affa-0b44b2224ec0-bluemix.cloudant.com",
+            "username": "09ed7c8a-fae8-48ea-affa-0b44b2224ec0-bluemix",
+
+          },
+          "label": "cloudantNoSQLDB-Test",
+          "name": "Cloudant-Test NoSQL DB-kd",
+          "plan": "Shared",
+          "tags": [
+            "data_management",
+            "ibm_created",
+            "ibm_dedicated_public"
+          ],
+
+        }
+      ],
+      "Auto-Scaling": [
+        {
+          "credentials": {
+            "url": "https://auto-scaling.ibm.com",
+            "agentUsername": "21a084f4-4eb56-74547-3bdc7be5df9/d2a85740-da7a-4615-aabf-5bdc35c63618",
+            "agentPassword": "auto-scaling-pwd",
+            "app_id": "auto-scaling-appID",
+            "service_id": "auto-scaling-serviceID",
+
+          },
+          "label": "Auto-Scaling",
+          "name": "IBM Auto Scaling-xs",
+          "plan": "free",
+          "tags": [
+            "devops",
+            "ibm_created",
+            "ibm_dedicated_public"
+          ]
+        }
+      ],
+      "alertnotification": [
+        {
+          "credentials": {
+            "url": "https://ibmnotifybm.mybluemix.net/api/alerts/v1",
+            "name": "21a084f4-4eb3-4de4-9834-33bdc7be5df9/d2a85740-da7a-4615-aabf-5bdc35c63618",
+            "password": "alertnotification-pwd",
+            "swaggerui": "https://ibmnotifybm.mybluemix.net/docs/alerts/v1"
+          },
+          "label": "alertnotification",
+          "name": "IBM Alert Notification-xs",
+          "plan": "authorizedusers",
+          "tags": [
+            "devops",
+            "ibm_created",
+            "ibm_dedicated_public"
+          ]
+        }
+      ],
+
     }
   }
 }
