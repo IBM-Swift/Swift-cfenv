@@ -27,6 +27,10 @@ import Configuration
 
 @testable import CloudFoundryEnv
 
+let configFileURL: URL = URL(fileURLWithPath: #file).appendingPathComponent("../resources/config.json").standardized
+let configFilePath = "../resources/config.json"
+let currentPath = #file
+
 /**
 * Useful online resources/tools:
 * - Escape JSON: http://www.freeformatter.com/javascript-escape.html
@@ -48,9 +52,6 @@ class MainTests: XCTestCase {
   }
 
   //var jsonOptions: [String:Any] = [:]
-  let configFileURL: URL = URL(fileURLWithPath: #file).appendingPathComponent("../resources/config.json").standardized
-  let configFilePath = "../resources/config.json"
-  let currentPath = #file
 
   override func setUp() {
     super.setUp()
@@ -127,6 +128,11 @@ class MainTests: XCTestCase {
     // Use part of type/label used in Bluemix (prefix)
     services = configManager.getServices(type: "cloudantNo")
     XCTAssertEqual(services.count, 2, "There should be only 2 services in the services array.")
+    // Sort array before verifying the first element, since the array is not guaranteed to be
+    // in the same order every time this test is executed.
+    services.sort() { left, right in
+        return left.label < right.label
+    }
     verifyService(service: services[0])
     services = configManager.getServices(type: "alertnotification")
     XCTAssertEqual(services.count, 1, "There should be only 1 service in the services array.")
@@ -199,10 +205,9 @@ class MainTests: XCTestCase {
       // Case #5
       replacements = "{ \"user\": \"username01\", \"password\": \"passw0rd\", \"port\": 9080, \"host\": \"bluemix.ibm.com\", \"scheme\": \"https\", \"query\": \"name0=value0&name1=value1\", \"queryItems\": [ { \"name\": \"name2\", \"value\": \"value2\" }, { \"name\": \"name3\", \"value\": \"value3\" } ] }"
       try verifyServiceURLWithOptions(name: name, replacements: replacements, expectedServiceURL: "https://username01:passw0rd@bluemix.ibm.com:9080?name2=value2&name3=value3")
-    } catch let error as NSError {
-      Log.error("Error domain: \(error.domain)")
-      Log.error("Error code: \(error.code)")
-      XCTFail("Could not get AppEnv object!")
+    } catch {
+        Log.error("Error : \(error)")
+        XCTFail("Could not get AppEnv object!")
     }
   }
 

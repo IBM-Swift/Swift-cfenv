@@ -177,7 +177,7 @@ extension ConfigurationManager {
     }
 
     do {
-      #if os(Linux)
+      #if os(Linux) && !swift(>=3.1)
       let regex = try RegularExpression(pattern: spec, options: RegularExpression.Options.caseInsensitive)
       #else
       let regex = try NSRegularExpression(pattern: spec, options: NSRegularExpression.Options.caseInsensitive)
@@ -189,8 +189,8 @@ extension ConfigurationManager {
           return serv
         }
       }
-    } catch let error as NSError {
-      Log.error("Error code: \(error.code)")
+    } catch {
+        Log.error("Error : \(error)")
     }
     return nil
   }
