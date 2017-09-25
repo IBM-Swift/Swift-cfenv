@@ -11,7 +11,7 @@ This library determines if you are running your application "locally" or on the 
 For the implementation of this Swift package, we used as inspiration a similar module that had been developed for Node.js applications, [node-cfenv](https://github.com/cloudfoundry-community/node-cfenv).
 
 ## Swift version
-The latest version of Swift-cfenv works with the `3.1.1` version of the Swift binaries. You can download this version of the Swift binaries by following this [link](https://swift.org/download/#snapshots).
+The latest version of Swift-cfenv works with the `4.0` version of the Swift binaries. You can download this version of the Swift binaries by following this [link](https://swift.org/download/#snapshots).
 
 ## Configuration
 The latest version of Swift-cfenv relies on the [Configuration](https://github.com/IBM-Swift/Configuration) package to load and merge configuration data from multiple sources, such as environment variables or JSON files. In previous versions of Swift-cfenv, the library was responsible for accessing the environment variables directly. Moving forward, newer versions of Swift-cfenv will continue to depend on the configuration data loaded into a `ConfigurationManager` instance. For further details on the Configuration package, see its [README](https://github.com/IBM-Swift/Configuration) file.
