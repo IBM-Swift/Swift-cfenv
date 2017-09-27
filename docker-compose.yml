@@ -1,8 +1,8 @@
 # docker-compose up
 app:
-  image: ibmcom/swift-ubuntu:3.1.1
+  image: ibmcom/swift-ubuntu:4.0
   ports:
     - "8080:8080"
   volumes:
-    - .:/root/Swift-cfenv
-  command: bash -c "cd /root/Swift-cfenv && rm -rf Packages && swift build --clean && swift build && swift test"
+    - .:/Swift-cfenv
+  command: bash -c "cd /Swift-cfenv && swift package --build-path .build-ubuntu clean && swift build --build-path .build-ubuntu && swift test --build-path .build-ubuntu"
