@@ -1,4 +1,4 @@
-[![Build Status - Develop](https://travis-ci.org/IBM-Swift/Swift-cfenv.svg?branch=master)](https://travis-ci.org/IBM-Swift/Swift-cfenv)
+[![Build Status](https://travis-ci.org/IBM-Swift/Swift-cfenv.svg?branch=master)](https://travis-ci.org/IBM-Swift/Swift-cfenv)
 ![macOS](https://img.shields.io/badge/os-macOS-green.svg?style=flat)
 ![Linux](https://img.shields.io/badge/os-linux-green.svg?style=flat)
 
