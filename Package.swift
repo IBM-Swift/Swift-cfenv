@@ -1,8 +1,5 @@
-// swift-tools-version:4.0
-// The swift-tools-version declares the minimum version of Swift required to build this package.
-
 /**
- * Copyright IBM Corporation 2016, 2017
+ * Copyright IBM Corporation 2016,2017
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,25 +18,15 @@ import PackageDescription
 
 let package = Package(
     name: "CloudFoundryEnv",
-    products: [
-      .library(
+    targets: [
+      Target(
         name: "CloudFoundryEnv",
-        targets: ["CloudFoundryEnv"]
-      )
+        dependencies: []
+      ),
     ],
     dependencies: [
       //.Package(url: "https://github.com/behrang/YamlSwift.git", majorVersion: 1),
-      .package(url: "https://github.com/IBM-Swift/LoggerAPI.git", .upToNextMajor(from: "2.0.0")),
-      .package(url: "https://github.com/IBM-Swift/Configuration.git", .upToNextMajor(from: "2.0.0")),
-    ],
-    targets: [
-      .target(
-        name: "CloudFoundryEnv",
-        dependencies: ["LoggerAPI", "Configuration"]
-      ),
-      .testTarget(
-        name: "CloudFoundryEnvTests",
-        dependencies: ["CloudFoundryEnv"]
-      ),
+      .Package(url: "https://github.com/IBM-Swift/LoggerAPI.git", majorVersion: 1),
+      .Package(url: "https://github.com/IBM-Swift/Configuration.git", majorVersion: 1),
     ]
 )
