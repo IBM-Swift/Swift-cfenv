@@ -184,7 +184,7 @@ extension ConfigurationManager {
       let regex = try NSRegularExpression(pattern: spec, options: NSRegularExpression.Options.caseInsensitive)
 
       for (name, serv) in services {
-        let numberOfMatches = regex.numberOfMatches(in: name, options: [], range: NSMakeRange(0, name.characters.count))
+        let numberOfMatches = regex.numberOfMatches(in: name, options: [], range: NSMakeRange(0, String(describing: name).count))
         if numberOfMatches > 0 {
           return serv
         }
