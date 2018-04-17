@@ -297,7 +297,11 @@ extension ConfigurationManager {
       return service
     }
     print("results: \(results)")
+    #if swift(>=4.1)
+    return results.compactMap { $0 }
+    #else
     return results.flatMap { $0 }
+    #endif
   }
 
 }
