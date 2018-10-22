@@ -17,7 +17,7 @@ matrix:
     - os: linux
       dist: trusty
       sudo: required
-      env: SWIFT_SNAPSHOT=swift-4.2-DEVELOPMENT-SNAPSHOT-2018-07-01-a
+      env: SWIFT_SNAPSHOT=swift-4.2
     - os: osx
       osx_image: xcode9.2
       sudo: required
@@ -25,9 +25,9 @@ matrix:
     - os: osx
       osx_image: xcode9.4
       sudo: required
-      env: SWIFT_SNAPSHOT=swift-4.2-DEVELOPMENT-SNAPSHOT-2018-06-04-a
+      env: SWIFT_SNAPSHOT=swift-4.1.2
     - os: osx
-      osx_image: xcode9.4
+      osx_image: xcode10
       sudo: required
 
 before_install:
