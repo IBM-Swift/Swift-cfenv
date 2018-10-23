@@ -1,3 +1,4 @@
+
 # whitelist (branches that should be built)
 branches:
   only:
@@ -17,7 +18,7 @@ matrix:
     - os: linux
       dist: trusty
       sudo: required
-      env: SWIFT_SNAPSHOT=swift-4.2
+      env: SWIFT_SNAPSHOT=4.2
     - os: osx
       osx_image: xcode9.2
       sudo: required
@@ -25,7 +26,7 @@ matrix:
     - os: osx
       osx_image: xcode9.4
       sudo: required
-      env: SWIFT_SNAPSHOT=swift-4.1.2
+      env: SWIFT_SNAPSHOT=4.1.2
     - os: osx
       osx_image: xcode10
       sudo: required
