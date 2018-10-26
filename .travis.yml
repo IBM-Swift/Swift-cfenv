@@ -1,4 +1,3 @@
-
 # whitelist (branches that should be built)
 branches:
   only:
