@@ -29,7 +29,7 @@ let package = Package(
     ],
     dependencies: [
         //.Package(url: "https://github.com/behrang/YamlSwift.git", majorVersion: 1),
-        .package(url: "https://github.com/Kitura/Configuration.git", .upToNextMajor(from: "3.0.0")),
+        .package(url: "https://github.com/Kitura/Configuration.git", .upToNextMajor(from: "3.0.200")),
     ],
     targets: [
         .target(
